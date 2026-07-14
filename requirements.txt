@@ -1,0 +1,7 @@
+openai
+playwright
+python-dotenv
+python-docx
+pymupdf
+pydantic
+loguru
