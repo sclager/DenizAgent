@@ -1,0 +1,8 @@
+{
+  "customer_name": "Müşteri/Firma Ünvanı",
+  "request_title": "Sorun",
+  "description": "Sorun açıklaması",
+  "requirements": "Gereksinimler",
+  "request_date": "İlk Geliş Tarihi",
+  "itsm_no": "ITSM Kayıt No"
+}

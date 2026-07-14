@@ -5,3 +5,5 @@ python-docx
 pymupdf
 pydantic
 loguru
+PySide6
+keyboard

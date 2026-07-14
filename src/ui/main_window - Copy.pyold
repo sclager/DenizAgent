@@ -1,0 +1,328 @@
+from __future__ import annotations
+
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QStackedWidget,
+    QVBoxLayout,
+    QWidget,
+)
+
+
+class MainWindow(QMainWindow):
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.setWindowTitle("Deniz Agent v0.1")
+        self.setMinimumSize(1000, 700)
+
+        self.stack = QStackedWidget()
+
+        root_widget = QWidget()
+        root_layout = QVBoxLayout(root_widget)
+        root_layout.setContentsMargins(24, 20, 24, 24)
+        root_layout.setSpacing(18)
+
+        root_layout.addWidget(self._create_header())
+        root_layout.addWidget(self._create_separator())
+        root_layout.addWidget(self.stack, stretch=1)
+
+        self.setCentralWidget(root_widget)
+
+        self.home_page = self._create_home_page()
+        self.stack.addWidget(self.home_page)
+
+        self.apply_styles()
+
+    def _create_header(self) -> QWidget:
+        header = QWidget()
+        layout = QHBoxLayout(header)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        title_area = QVBoxLayout()
+        title_area.setSpacing(3)
+
+        title = QLabel("DENİZ AGENT")
+        title.setObjectName("headerTitle")
+
+        subtitle = QLabel(
+            "Talep dokümanı ve SharePoint kayıt otomasyonu"
+        )
+        subtitle.setObjectName("headerSubtitle")
+
+        title_area.addWidget(title)
+        title_area.addWidget(subtitle)
+
+        version = QLabel("v0.1")
+        version.setObjectName("versionLabel")
+        version.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        version.setFixedSize(65, 32)
+
+        layout.addLayout(title_area)
+        layout.addStretch()
+        layout.addWidget(version)
+
+        return header
+
+    @staticmethod
+    def _create_separator() -> QFrame:
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setObjectName("separator")
+
+        return separator
+
+    def _create_home_page(self) -> QWidget:
+        page = QWidget()
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(10, 20, 10, 10)
+        layout.setSpacing(16)
+
+        heading = QLabel("Yapmak istediğiniz işlemi seçin")
+        heading.setObjectName("pageHeading")
+
+        description = QLabel(
+            "Her işlem, mevcut Deniz Agent modüllerini kullanarak "
+            "adım adım ilerleyecektir."
+        )
+        description.setObjectName("pageDescription")
+        description.setWordWrap(True)
+
+        layout.addWidget(heading)
+        layout.addWidget(description)
+        layout.addSpacing(10)
+
+        layout.addWidget(
+            self._create_operation_card(
+                number="1",
+                title="Doküman Oluştur + SharePoint Kaydı",
+                description=(
+                    "Müşteri bilgilerini ve 7 başlıklı talep metnini "
+                    "kullanarak şirket Word dokümanını oluşturur ve "
+                    "SharePoint formunu doldurur."
+                ),
+                button_text="Doküman Oluştur",
+                callback=self.open_document_creation,
+            )
+        )
+
+        layout.addWidget(
+            self._create_operation_card(
+                number="2",
+                title="Mevcut Dokümandan SharePoint Kaydı",
+                description=(
+                    "Daha önce hazırlanmış bir DOCX dosyasını seçer, "
+                    "verileri ayrıştırır ve SharePoint formunu doldurur."
+                ),
+                button_text="Doküman Seç",
+                callback=self.open_existing_document,
+            )
+        )
+
+        layout.addWidget(
+            self._create_operation_card(
+                number="3",
+                title="Toplantı Kaydı Oluştur",
+                description=(
+                    "Müşteri, toplantı konusu ve toplantı tarihini "
+                    "alarak dokümansız SharePoint toplantı kaydı oluşturur."
+                ),
+                button_text="Toplantı Kaydı",
+                callback=self.open_meeting_creation,
+            )
+        )
+
+        layout.addStretch()
+
+        status = QLabel(
+            "Sistem Durumu: Arayüz hazır — işlem modülleri bağlanmayı bekliyor."
+        )
+        status.setObjectName("statusLabel")
+
+        layout.addWidget(status)
+
+        return page
+
+    def _create_operation_card(
+        self,
+        number: str,
+        title: str,
+        description: str,
+        button_text: str,
+        callback,
+    ) -> QFrame:
+        card = QFrame()
+        card.setObjectName("operationCard")
+
+        layout = QHBoxLayout(card)
+        layout.setContentsMargins(20, 18, 20, 18)
+        layout.setSpacing(18)
+
+        number_label = QLabel(number)
+        number_label.setObjectName("operationNumber")
+        number_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        number_label.setFixedSize(50, 50)
+
+        content_layout = QVBoxLayout()
+        content_layout.setSpacing(6)
+
+        title_label = QLabel(title)
+        title_label.setObjectName("operationTitle")
+
+        description_label = QLabel(description)
+        description_label.setObjectName("operationDescription")
+        description_label.setWordWrap(True)
+
+        content_layout.addWidget(title_label)
+        content_layout.addWidget(description_label)
+
+        action_button = QPushButton(button_text)
+        action_button.setObjectName("primaryButton")
+        action_button.setMinimumWidth(170)
+        action_button.setMinimumHeight(42)
+        action_button.clicked.connect(callback)
+
+        layout.addWidget(number_label)
+        layout.addLayout(content_layout, stretch=1)
+        layout.addWidget(action_button)
+
+        return card
+
+    def open_document_creation(self) -> None:
+        QMessageBox.information(
+            self,
+            "Doküman Oluşturma",
+            (
+                "Doküman oluşturma ekranı sonraki adımda "
+                "bu butona bağlanacaktır."
+            ),
+        )
+
+    def open_existing_document(self) -> None:
+        QMessageBox.information(
+            self,
+            "Mevcut Doküman",
+            (
+                "DOCX seçme ve SharePoint doldurma ekranı "
+                "sonraki adımda bağlanacaktır."
+            ),
+        )
+
+    def open_meeting_creation(self) -> None:
+        QMessageBox.information(
+            self,
+            "Toplantı Kaydı",
+            (
+                "Toplantı kayıt formu sonraki adımda "
+                "bu butona bağlanacaktır."
+            ),
+        )
+
+    def apply_styles(self) -> None:
+        self.setStyleSheet(
+            """
+            QMainWindow {
+                background-color: #f4f6f9;
+            }
+
+            QWidget {
+                font-family: "Segoe UI";
+                font-size: 14px;
+                color: #1f2937;
+            }
+
+            QLabel#headerTitle {
+                font-size: 26px;
+                font-weight: 700;
+                color: #123d6a;
+            }
+
+            QLabel#headerSubtitle {
+                font-size: 13px;
+                color: #667085;
+            }
+
+            QLabel#versionLabel {
+                background-color: #123d6a;
+                color: white;
+                border-radius: 8px;
+                font-weight: 700;
+            }
+
+            QFrame#separator {
+                color: #d8dee8;
+                background-color: #d8dee8;
+                max-height: 1px;
+            }
+
+            QLabel#pageHeading {
+                font-size: 22px;
+                font-weight: 650;
+                color: #172b4d;
+            }
+
+            QLabel#pageDescription {
+                color: #667085;
+            }
+
+            QFrame#operationCard {
+                background-color: white;
+                border: 1px solid #dce3ec;
+                border-radius: 12px;
+            }
+
+            QFrame#operationCard:hover {
+                border: 1px solid #6b94bd;
+            }
+
+            QLabel#operationNumber {
+                background-color: #e8f1fb;
+                color: #123d6a;
+                border-radius: 25px;
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            QLabel#operationTitle {
+                font-size: 17px;
+                font-weight: 650;
+                color: #1c3553;
+            }
+
+            QLabel#operationDescription {
+                color: #667085;
+                font-size: 13px;
+            }
+
+            QPushButton#primaryButton {
+                background-color: #185b96;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 18px;
+                font-weight: 600;
+            }
+
+            QPushButton#primaryButton:hover {
+                background-color: #124b7e;
+            }
+
+            QPushButton#primaryButton:pressed {
+                background-color: #0c3b64;
+            }
+
+            QLabel#statusLabel {
+                background-color: #eaf7ee;
+                color: #237a3b;
+                border: 1px solid #b8dfc3;
+                border-radius: 8px;
+                padding: 10px;
+            }
+            """
+        )

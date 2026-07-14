@@ -1,0 +1,24 @@
+from __future__ import annotations
+
+import sys
+
+from PySide6.QtWidgets import QApplication
+
+from src.ui.main_window import MainWindow
+
+
+def main() -> None:
+    application = QApplication(sys.argv)
+
+    application.setApplicationName("Deniz Agent")
+    application.setOrganizationName("Deniz Agent")
+
+    window = MainWindow()
+    window.show()
+
+    exit_code = application.exec()
+    sys.exit(exit_code)
+
+
+if __name__ == "__main__":
+    main()

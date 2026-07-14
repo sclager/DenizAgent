@@ -4,3 +4,22 @@ __pycache__/
 *.pyc
 logs/
 output/
+browser_profile/
+# Generated documents
+documents/DEVCR_*.docx
+
+# Output files
+output/
+
+# Browser profile
+browser_profile/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Backup files
+*.OLD
+
+# Temporary images
+*.png
