@@ -3,8 +3,11 @@ from pydantic import BaseModel
 
 class RequestModel(BaseModel):
     itsm_no: str = ""
-    customer_name: str = ""
+    request_form_no: str = ""
     request_date: str = ""
-    problem: str = ""
+    customer_name: str = ""
+    country: str = ""
+    category: str = ""
+    request_title: str = ""
     description: str = ""
     requirements: str = ""
